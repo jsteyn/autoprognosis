@@ -16,23 +16,33 @@ RUN add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-
 RUN apt-get update
 RUN apt-get upgrade -y
 
-COPY autoprognosis.zip /
-RUN unzip autoprognosis
-COPY autoprognosis/* /autoprognosis/
+## COPY ALL AutoPrognosis files
+COPY autoprognosis/ /autoprognosis/
+COPY init/ /init/
+COPY util/ /util/
 COPY requirements.txt /autoprognosis/.
 COPY install_packages.r /autoprognosis/.
-RUN ls -la /
-RUN cd /autoprognosis
-RUN Rscript /autoprognosis/install_packages.r
-RUN pip3 install cython jupyter jupyter-core notebook pivottablejs GPyOpt pandas numpy
-RUN pip3 install matplotlib tqdm rpy2 xgboost==1.0.1 scikit-learn==0.21.1
-RUN python3 -m pip install tensorflow 
-RUN mkdir /root/.jupyter
-RUN jupyter nbextension enable --py widgetsnbextension
-COPY jupyter_notebook_config.py /root/.jupyter/.
+
+## COPY DATA FILES
 COPY spambase.csv /autoprognosis/spambase.csv
 # https://www.kaggle.com/uciml/breast-cancer-wisconsin-data
 COPY kaggle_breastcancer.csv /autoprognosis/kaggle_breastcancer.csv
+RUN ls -la /
+
+## INSTALL ALL THINGS R
+RUN cd /autoprognosis
+RUN Rscript /autoprognosis/install_packages.r
+
+## INSTALL ALL THINGS PYTHON
+RUN pip3 install cython jupyter jupyter-core notebook pivottablejs GPyOpt pandas numpy
+RUN pip3 install matplotlib tqdm rpy2 xgboost==1.0.1 scikit-learn==0.21.1 ipywidgets==7.1
+RUN python3 -m pip install tensorflow 
+
+## INSTALL ALL THINGS JUPYTER
+RUN mkdir /root/.jupyter
+RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
+# RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager
+COPY jupyter_notebook_config.py /root/.jupyter/.
 
 # Run command to keep container running
 CMD cd /autoprognosis; jupyter notebook --port=8080 --no-browser --ip=0.0.0.0 --allow-root
