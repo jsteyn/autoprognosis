@@ -39,8 +39,8 @@ COPY kaggle_breastcancer.csv /autoprognosis/kaggle_breastcancer.csv
 RUN ls -la /
 
 ## COPY ALL AutoPrognosis files
-RUN git clone https://github.com/ahmedmalaa/AutoPrognosis.git
-COPY autoprognosis/ /autoprognosis/
+RUN git clone https://github.com/ahmedmalaa/AutoPrognosis.git 
+RUN mv /AutoPrognosis/alg/autoprognosis /autoprognosis/.
 COPY init/ /init/
 COPY util/ /util/
 COPY requirements.txt /autoprognosis/.
@@ -50,6 +50,7 @@ RUN cd /autoprognosis
 RUN Rscript /autoprognosis/install_packages.r
 ## PYTHON STUFF FOR AUTOPROGNOSIS
 RUN python3 -m pip install -r /autoprognosis/requirements.txt
+COPY *.ipynb /autoprognosis/
 
 # Run command to keep container running
 CMD cd /autoprognosis; jupyter notebook --port=8080 --no-browser --ip=0.0.0.0 --allow-root
