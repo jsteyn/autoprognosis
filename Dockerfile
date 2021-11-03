@@ -41,11 +41,11 @@ RUN ls -la /
 ## COPY ALL AutoPrognosis files
 RUN git clone https://github.com/ahmedmalaa/AutoPrognosis.git 
 RUN mv /AutoPrognosis/alg/autoprognosis /autoprognosis/.
-COPY init/ /init/
-COPY util/ /util/
 COPY requirements.txt /autoprognosis/.
 COPY install_packages.r /autoprognosis/.
 RUN cd /autoprognosis
+COPY util /autoprognosis/util
+COPY init /autoprognosis/init
 ## R STUFF FOR AUTOPROGNOSIS
 RUN Rscript /autoprognosis/install_packages.r
 ## PYTHON STUFF FOR AUTOPROGNOSIS

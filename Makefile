@@ -1,8 +1,11 @@
 DOCKERPORT=8080
-HOSTPORT=8080
+HOSTPORT=8088
 VERSION=2.0
 CONTAINER=jannetta/autoprognosis
 NAME=autoprognosis
+VOLUME=mlflow
+HOSTMOUNTPOINT=/home/jannetta/DOCKERVOLUMES/MLFlow/autoprognosis/
+DOCKERMOUNTPOINT=/autoprognosis
 DOCKERFILE=Dockerfile
 
 
@@ -11,6 +14,9 @@ echo:
 build:
 	zip -r autoprognosis.zip autoprognosis util init
 	docker build --force-rm -f $(DOCKERFILE) -t $(CONTAINER):$(VERSION) .
+
+run_mount:
+	docker run -d --rm --name $(NAME) -p $(HOSTPORT):$(DOCKERPORT) -v $(HOSTMOUNTPOINT):$(DOCKERMOUNTPOINT) $(CONTAINER):$(VERSION)
 
 run:
 	docker run -d --rm --name $(NAME) -p $(HOSTPORT):$(DOCKERPORT) $(CONTAINER):$(VERSION)
@@ -32,3 +38,9 @@ install:
 
 push:
 	git push --atomic origin master $(VERSION)
+
+network:
+	docker network create --gateway 172.16.1.1 --subnet 172.16.1.0/24 mvc_network
+
+remove:
+	docker image rm $(CONTAINER):$(VERSION)
